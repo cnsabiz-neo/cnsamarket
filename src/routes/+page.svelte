@@ -1,5 +1,5 @@
 <script>
-  import { PartyPopper, Search } from 'lucide-svelte';
+  import { PartyPopper, Search, ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-svelte';
   import ItemCard from '$lib/components/ItemCard.svelte';
   import ItemModal from '$lib/components/ItemModal.svelte';
 
@@ -38,6 +38,25 @@
     { key: 'over10', label: '10,000 초과' }
   ];
 
+  // Sort
+  let sortKey = null;  // 'price' | 'class' | 'date'
+  let sortDir = 'asc';
+
+  const SORT_OPTIONS = [
+    { key: 'price', label: '가격' },
+    { key: 'class', label: '반' },
+    { key: 'date',  label: '등록일' }
+  ];
+
+  function handleSort(key) {
+    if (sortKey === key) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey = key;
+      sortDir = 'asc';
+    }
+  }
+
   $: filteredItems = items.filter((item) => {
     if (onlyAvailable && item.is_reserved) return false;
     if (selectedClass !== 0 && item.class_num !== selectedClass) return false;
@@ -53,6 +72,23 @@
     return true;
   });
 
+  $: sortedItems = (() => {
+    if (!sortKey) return filteredItems;
+    return [...filteredItems].sort((a, b) => {
+      let av, bv;
+      if (sortKey === 'price') {
+        av = a.price ?? 0; bv = b.price ?? 0;
+      } else if (sortKey === 'class') {
+        av = a.class_num * 10 + (a.group_num ?? 0);
+        bv = b.class_num * 10 + (b.group_num ?? 0);
+      } else {
+        av = new Date(a.created_at).getTime();
+        bv = new Date(b.created_at).getTime();
+      }
+      return sortDir === 'asc' ? av - bv : bv - av;
+    });
+  })();
+
   function handleReserved(e) {
     const updated = e.detail.item;
     items = items.map((i) => (i.id === updated.id ? updated : i));
@@ -63,7 +99,7 @@
 </script>
 
 <svelte:head>
-  <title>아나바다 장터</title>
+  <title>큰사마켓</title>
 </svelte:head>
 
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
@@ -167,6 +203,32 @@
       </div>
     </div>
 
+    <!-- Sort -->
+    <div>
+      <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">정렬</p>
+      <div class="flex flex-wrap gap-1.5">
+        {#each SORT_OPTIONS as opt}
+          <button
+            class="filter-btn flex items-center gap-1 {sortKey === opt.key ? 'filter-btn-active' : 'filter-btn-inactive'}"
+            on:click={() => handleSort(opt.key)}
+          >
+            {opt.label}
+            {#if sortKey === opt.key}
+              {#if sortDir === 'asc'}<ArrowUp size={12} />{:else}<ArrowDown size={12} />{/if}
+            {:else}
+              <ChevronsUpDown size={12} class="opacity-30" />
+            {/if}
+          </button>
+        {/each}
+        {#if sortKey}
+          <button
+            class="filter-btn filter-btn-inactive text-gray-300 hover:text-gray-500"
+            on:click={() => { sortKey = null; sortDir = 'asc'; }}
+          >초기화</button>
+        {/if}
+      </div>
+    </div>
+
     <!-- Available-only toggle -->
     <button
       type="button"
@@ -192,7 +254,7 @@
 
   <!-- Grid -->
   <section>
-    {#if filteredItems.length === 0}
+    {#if sortedItems.length === 0}
       {#if onlyAvailable && !searchQuery}
         <div class="flex flex-col items-center text-center py-20 px-6">
           <div class="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center mb-5">
@@ -218,7 +280,7 @@
       {/if}
     {:else}
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-        {#each filteredItems as item (item.id)}
+        {#each sortedItems as item (item.id)}
           <ItemCard {item} onSelect={(i) => (selectedItem = i)} />
         {/each}
       </div>
