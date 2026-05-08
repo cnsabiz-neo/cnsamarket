@@ -1,7 +1,7 @@
 <script>
   import '../app.css';
   import { page } from '$app/stores';
-  import { ShoppingBag, BarChart2, Settings, Package, PlusCircle } from 'lucide-svelte';
+  import { BarChart2, Settings, Package, PlusCircle } from 'lucide-svelte';
 </script>
 
 <div class="min-h-screen flex flex-col bg-white">
@@ -10,9 +10,7 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2.5 group">
-        <div class="w-8 h-8 bg-primary rounded-[10px] flex items-center justify-center">
-          <ShoppingBag size={15} color="white" strokeWidth={2.5} />
-        </div>
+        <img src="/logo.png" alt="아나바다 장터 로고" class="w-8 h-8 object-contain" />
         <span class="font-semibold text-ink tracking-tight">아나바다 장터</span>
       </a>
 
