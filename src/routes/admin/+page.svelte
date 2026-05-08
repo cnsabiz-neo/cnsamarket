@@ -2,9 +2,9 @@
   import { enhance } from '$app/forms';
   import { invalidateAll } from '$app/navigation';
   import {
-    LogIn, Search, Trash2, RotateCcw, ImageOff,
-    ShieldCheck, ShieldAlert, Wallet, Plus,
-    Download, Loader2, Info, X, ChevronUp
+    Lock, LogOut, Search, Trash2, RotateCcw, ImageOff,
+    ShieldCheck, Wallet, Plus, ChevronUp,
+    Download, Loader2, Info, X
   } from 'lucide-svelte';
   import { supabase } from '$lib/supabase.js';
 
@@ -12,14 +12,6 @@
   export let form;
 
   $: ({ authed, items, stats } = data);
-  $: user = data.user;   // comes from layout load
-
-  async function signIn() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
-    });
-  }
 
   const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n);
 
@@ -111,31 +103,30 @@
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
 
   {#if !authed}
-    <!-- ── Not authed ───────────────────────────────────────── -->
-    <div class="max-w-sm mx-auto mt-16 text-center">
-      {#if !user}
-        <!-- Not logged in at all -->
-        <div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-primary/20">
-          <ShieldCheck size={24} color="white" />
+    <!-- ── Login ─────────────────────────────────────────────── -->
+    <div class="max-w-sm mx-auto mt-8">
+      <div class="text-center mb-8">
+        <div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
+          <Lock size={24} color="white" />
         </div>
-        <h1 class="text-2xl font-bold text-ink mb-2">관리자 전용 페이지</h1>
-        <p class="text-gray-400 text-sm mb-8">관리 기능을 사용하려면 Google 계정으로 로그인하세요.</p>
-        <button on:click={signIn}
-          class="inline-flex items-center gap-2 btn-primary px-6 py-3 text-sm">
-          <LogIn size={16} /> Google로 로그인
-        </button>
-      {:else}
-        <!-- Logged in but not admin -->
-        <div class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
-          <ShieldAlert size={24} class="text-red-400" />
+        <h1 class="text-2xl font-bold text-ink">팀장 로그인</h1>
+        <p class="text-gray-400 text-sm mt-1.5">팀장(선생님) 전용 관리 페이지입니다.</p>
+      </div>
+
+      {#if form?.loginError}
+        <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+          {form.loginError}
         </div>
-        <h1 class="text-2xl font-bold text-ink mb-2">접근 권한 없음</h1>
-        <p class="text-gray-400 text-sm mb-1">
-          <span class="font-medium text-ink">{user.email}</span> 계정은<br />
-          관리자 권한이 없습니다.
-        </p>
-        <p class="text-xs text-gray-300 mt-4">담당 선생님께 권한 추가를 요청하세요.</p>
       {/if}
+
+      <form method="POST" action="?/login" class="space-y-4">
+        <div>
+          <label for="password" class="block text-sm font-medium text-ink mb-2">비밀번호</label>
+          <input id="password" name="password" type="password" class="input-field"
+            placeholder="관리자 비밀번호" required />
+        </div>
+        <button type="submit" class="btn-primary w-full py-3">로그인</button>
+      </form>
     </div>
 
   {:else}
@@ -148,7 +139,11 @@
         </div>
         <p class="text-gray-400 text-sm">물품 등록, 예약 현황, 수익을 관리합니다.</p>
       </div>
-      <p class="text-xs text-gray-400 hidden sm:block">{user?.email ?? ''}</p>
+      <form method="POST" action="?/logout">
+        <button type="submit" class="btn-ghost flex items-center gap-1.5 text-sm">
+          <LogOut size={14} /> 로그아웃
+        </button>
+      </form>
     </div>
 
     <!-- ── Stats ─────────────────────────────────────────────── -->
