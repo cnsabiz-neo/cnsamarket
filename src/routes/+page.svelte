@@ -28,17 +28,12 @@
     { key: 'over10', label: '10,000 초과' }
   ];
 
-  function matchesPrice(item) {
-    if (priceFilter === 'under5')  return item.price < 5000;
-    if (priceFilter === '5to10')   return item.price >= 5000 && item.price <= 10000;
-    if (priceFilter === 'over10')  return item.price > 10000;
-    return true;
-  }
-
   $: filteredItems = items.filter((item) => {
     if (onlyAvailable && item.is_reserved) return false;
     if (selectedClass !== 0 && item.class_num !== selectedClass) return false;
-    if (!matchesPrice(item)) return false;
+    if (priceFilter === 'under5'  && item.price >= 5000) return false;
+    if (priceFilter === '5to10'   && (item.price < 5000 || item.price > 10000)) return false;
+    if (priceFilter === 'over10'  && item.price <= 10000) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return item.title.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q);
