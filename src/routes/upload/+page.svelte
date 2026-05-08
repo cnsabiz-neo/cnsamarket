@@ -1,19 +1,21 @@
 <script>
   import { enhance } from '$app/forms';
   import { ImagePlus, X, Loader2, Info } from 'lucide-svelte';
+  import { supabase } from '$lib/supabase.js';
 
   export let form;
 
   let imagePreview = null;
-  let loading = false;
-  let priceValue = '';
+  let imageFile    = null;
+  let clientError  = '';
+  let loading      = false;
+  let priceValue   = '';
 
   const fmt = (v) => {
     const n = parseInt(v.replace(/\D/g, ''), 10);
     return isNaN(n) ? '' : new Intl.NumberFormat('ko-KR').format(n);
   };
 
-  // Live price validation feedback
   $: priceNum = parseInt(priceValue.replace(/\D/g, '') || '0');
   $: priceError =
     priceValue && (priceNum < 1000 || priceNum > 20000)
@@ -27,7 +29,8 @@
 
   function handleImageChange(e) {
     const file = e.target.files?.[0];
-    if (!file) { imagePreview = null; return; }
+    if (!file) { imagePreview = null; imageFile = null; return; }
+    imageFile = file;
     const reader = new FileReader();
     reader.onload = (ev) => { imagePreview = ev.target.result; };
     reader.readAsDataURL(file);
@@ -35,7 +38,8 @@
 
   function clearImage() {
     imagePreview = null;
-    const input = document.getElementById('image-input');
+    imageFile    = null;
+    const input  = document.getElementById('image-input');
     if (input) input.value = '';
   }
 </script>
@@ -50,7 +54,11 @@
     <p class="text-gray-400 text-sm mt-1">우리 모둠에서 판매할 물품을 등록해주세요.</p>
   </div>
 
-  {#if form?.error}
+  {#if clientError}
+    <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-6">
+      {clientError}
+    </div>
+  {:else if form?.error}
     <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-6">
       {form.error}
     </div>
@@ -58,14 +66,50 @@
 
   <form
     method="POST"
-    enctype="multipart/form-data"
-    use:enhance={() => {
+    use:enhance={async ({ formData, cancel }) => {
       loading = true;
-      return async ({ update }) => { loading = false; update(); };
+      clientError = '';
+
+      // Upload image directly from browser to Supabase Storage
+      if (imageFile) {
+        const ext = imageFile.name.split('.').pop()?.toLowerCase();
+        if (!['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext ?? '')) {
+          clientError = '지원하지 않는 이미지 형식입니다. (jpg, png, webp, gif)';
+          loading = false;
+          cancel();
+          return;
+        }
+        if (imageFile.size > 10 * 1024 * 1024) {
+          clientError = '이미지 크기는 10MB 이하여야 합니다.';
+          loading = false;
+          cancel();
+          return;
+        }
+
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from('items')
+          .upload(fileName, imageFile, { contentType: imageFile.type });
+
+        if (upErr) {
+          clientError = `이미지 업로드 실패: ${upErr.message}`;
+          loading = false;
+          cancel();
+          return;
+        }
+
+        const { data } = supabase.storage.from('items').getPublicUrl(fileName);
+        formData.set('image_url', data.publicUrl);
+      }
+
+      return async ({ update }) => {
+        loading = false;
+        await update();
+      };
     }}
     class="space-y-5"
   >
-    <!-- Image -->
+    <!-- Image (file input — NOT sent to server, uploaded from browser) -->
     <div>
       <label class="block text-sm font-medium text-ink mb-2">물품 사진</label>
 
@@ -83,13 +127,13 @@
                  border-gray-200 cursor-pointer hover:border-primary hover:bg-primary-light/20 transition-colors">
           <ImagePlus size={28} class="text-gray-300 mb-2" />
           <span class="text-sm text-gray-400">클릭하여 사진 선택</span>
-          <span class="text-xs text-gray-300 mt-1">JPG, PNG, WebP · 최대 5MB</span>
+          <span class="text-xs text-gray-300 mt-1">JPG, PNG, WebP · 최대 10MB</span>
         </label>
       {/if}
 
-      <input id="image-input" type="file" name="image" accept="image/*" class="hidden" on:change={handleImageChange} />
+      <!-- No name attribute — file is NOT sent to the server -->
+      <input id="image-input" type="file" accept="image/*" class="hidden" on:change={handleImageChange} />
 
-      <!-- Aspect ratio hint -->
       <div class="flex items-start gap-1.5 mt-2">
         <Info size={13} class="text-primary flex-shrink-0 mt-px" />
         <p class="text-xs text-gray-400 leading-relaxed">
@@ -173,7 +217,8 @@
       class="btn-primary w-full py-3 text-base flex items-center justify-center gap-2"
       disabled={loading || !!priceError || !priceValue}>
       {#if loading}
-        <Loader2 size={16} class="animate-spin" /> 등록 중...
+        <Loader2 size={16} class="animate-spin" />
+        {imageFile ? '사진 업로드 중...' : '등록 중...'}
       {:else}
         물품 등록하기
       {/if}

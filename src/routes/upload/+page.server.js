@@ -10,7 +10,7 @@ export const actions = {
     const classNum    = parseInt(formData.get('class_num') ?? '0');
     const groupNum    = parseInt(formData.get('group_num') ?? '0');
     const priceRaw    = parseInt(formData.get('price') ?? '0');
-    const imageFile   = formData.get('image');
+    const imageUrl    = formData.get('image_url')?.toString() || null;
 
     // Validation
     if (!title)
@@ -21,32 +21,6 @@ export const actions = {
       return fail(400, { error: '올바른 모둠을 선택해주세요.' });
     if (isNaN(priceRaw) || priceRaw < 1000 || priceRaw > 20000)
       return fail(400, { error: '가격은 1,000 ~ 20,000 비즈쿨 머니 사이여야 합니다.' });
-
-    let imageUrl = null;
-
-    if (imageFile && imageFile.size > 0) {
-      if (imageFile.size > 5 * 1024 * 1024)
-        return fail(400, { error: '이미지 크기는 5MB 이하여야 합니다.' });
-
-      const ext = imageFile.name.split('.').pop()?.toLowerCase();
-      if (!['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext ?? ''))
-        return fail(400, { error: '지원하지 않는 이미지 형식입니다. (jpg, png, webp, gif)' });
-
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const buffer   = new Uint8Array(await imageFile.arrayBuffer());
-
-      const { error: uploadError } = await supabaseAdmin.storage
-        .from('items')
-        .upload(fileName, buffer, { contentType: imageFile.type });
-
-      if (uploadError) {
-        console.error('Image upload error:', uploadError);
-        return fail(500, { error: `이미지 업로드 실패: ${uploadError.message}` });
-      }
-
-      const { data: urlData } = supabaseAdmin.storage.from('items').getPublicUrl(fileName);
-      imageUrl = urlData.publicUrl;
-    }
 
     const { error: insertError } = await supabaseAdmin.from('items').insert({
       title,
