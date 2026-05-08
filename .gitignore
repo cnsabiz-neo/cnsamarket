@@ -6,6 +6,9 @@ node_modules/
 build/
 dist/
 
+# Vercel build output
+.vercel/
+
 # Environment variables — NEVER commit secrets
 .env
 .env.local
