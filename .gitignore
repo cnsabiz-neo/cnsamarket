@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# SvelteKit build output
+.svelte-kit/
+build/
+dist/
+
+# Environment variables — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Type checking cache
+tsconfig.tsbuildinfo
