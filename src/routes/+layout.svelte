@@ -71,6 +71,6 @@
 
   <!-- Footer -->
   <footer class="border-t border-gray-100 py-5 text-center text-xs text-gray-300">
-    &copy; 2026 아나바다 장터 &nbsp;|&nbsp; Developed by 본인 이름 입력
+    &copy; 2026 아나바다 장터 &nbsp;|&nbsp; Developed by 20529 차유근
   </footer>
 </div>
