@@ -10,7 +10,7 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2.5 group">
-        <img src="/logo.png" alt="아나바다 장터 로고" class="w-8 h-8 object-contain" />
+        <img src="/logo.png" alt="아나바다 장터 로고" class="h-9 w-auto object-contain" />
         <span class="font-semibold text-ink tracking-tight">아나바다 장터</span>
       </a>
 
