@@ -152,7 +152,7 @@
       <div class="flex flex-wrap gap-1.5">
         <button
           class="filter-btn {selectedClass === 0 ? 'filter-btn-active' : 'filter-btn-inactive'}"
-          on:click={() => { selectedClass = 0; selectedGroup = 0; }}
+          on:click={() => { selectedClass = 0; }}
         >전체</button>
         {#each Array.from({ length: 12 }, (_, i) => i + 1) as c}
           <button
