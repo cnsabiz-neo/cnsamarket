@@ -5,5 +5,5 @@ import ws from 'ws';
 
 export const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
-  realtime: { WebSocket: ws }
+  realtime: { transport: ws }
 });
