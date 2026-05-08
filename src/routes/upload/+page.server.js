@@ -60,7 +60,7 @@ export const actions = {
 
     if (insertError) {
       console.error('Insert error:', insertError);
-      return fail(500, { error: '물품 등록에 실패했습니다.' });
+      return fail(500, { error: `물품 등록 실패: ${insertError.message} (code: ${insertError.code})` });
     }
 
     throw redirect(303, '/?uploaded=1');
