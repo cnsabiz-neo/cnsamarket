@@ -9,6 +9,7 @@
 
   // Filters
   let selectedClass = 0;
+  let selectedGroup = 0;
   let searchQuery   = '';
   let onlyAvailable = false;
   let priceFilter   = 'all'; // 'all' | 'under5' | '5to10' | 'over10'
@@ -31,6 +32,7 @@
   $: filteredItems = items.filter((item) => {
     if (onlyAvailable && item.is_reserved) return false;
     if (selectedClass !== 0 && item.class_num !== selectedClass) return false;
+    if (selectedGroup !== 0 && item.group_num !== selectedGroup) return false;
     if (priceFilter === 'under5'  && item.price >= 5000) return false;
     if (priceFilter === '5to10'   && (item.price < 5000 || item.price > 10000)) return false;
     if (priceFilter === 'over10'  && item.price <= 10000) return false;
@@ -40,10 +42,6 @@
     }
     return true;
   });
-
-  function selectClass(c) {
-    selectedClass = selectedClass === c ? 0 : c;
-  }
 
   function handleReserved(e) {
     const updated = e.detail.item;
@@ -107,26 +105,31 @@
   <!-- Filters -->
   <section class="space-y-4">
 
-    <!-- Available-only toggle — full-width tappable on mobile -->
-    <button
-      type="button"
-      role="switch"
-      aria-checked={onlyAvailable}
-      on:click={() => (onlyAvailable = !onlyAvailable)}
-      class="w-full sm:w-auto sm:ml-auto flex items-center justify-between sm:justify-end gap-3
-             px-4 py-3 sm:px-3 sm:py-2 rounded-xl border transition-colors duration-150
-             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1
-             {onlyAvailable ? 'bg-primary-light border-primary/30' : 'bg-white border-gray-100 hover:border-gray-200'}"
-    >
-      <span class="text-sm font-medium {onlyAvailable ? 'text-primary' : 'text-gray-500'} transition-colors">
-        예약 가능한 물품만 보기
-      </span>
-      <span class="relative flex-shrink-0 w-10 h-[22px] rounded-full transition-colors duration-200
-                   {onlyAvailable ? 'bg-primary' : 'bg-gray-200'}">
-        <span class="absolute top-[3px] left-[3px] w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200
-                     {onlyAvailable ? 'translate-x-[18px]' : 'translate-x-0'}"></span>
-      </span>
-    </button>
+    <!-- Class & Group dropdowns -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">반</label>
+        <select
+          class="input-field"
+          bind:value={selectedClass}
+          on:change={() => (selectedGroup = 0)}
+        >
+          <option value={0}>전체 반</option>
+          {#each Array.from({ length: 12 }, (_, i) => i + 1) as c}
+            <option value={c}>{c}반</option>
+          {/each}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">모둠</label>
+        <select class="input-field" bind:value={selectedGroup}>
+          <option value={0}>전체 모둠</option>
+          {#each [1, 2, 3, 4, 5] as g}
+            <option value={g}>{g}모둠</option>
+          {/each}
+        </select>
+      </div>
+    </div>
 
     <!-- Price range chips -->
     <div>
@@ -141,22 +144,26 @@
       </div>
     </div>
 
-    <!-- Class filter -->
-    <div>
-      <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">반</p>
-      <div class="flex flex-wrap gap-1.5">
-        <button
-          class="filter-btn {selectedClass === 0 ? 'filter-btn-active' : 'filter-btn-inactive'}"
-          on:click={() => { selectedClass = 0; }}
-        >전체</button>
-        {#each Array.from({ length: 12 }, (_, i) => i + 1) as c}
-          <button
-            class="filter-btn {selectedClass === c ? 'filter-btn-active' : 'filter-btn-inactive'}"
-            on:click={() => selectClass(c)}
-          >{c}반</button>
-        {/each}
-      </div>
-    </div>
+    <!-- Available-only toggle -->
+    <button
+      type="button"
+      role="switch"
+      aria-checked={onlyAvailable}
+      on:click={() => (onlyAvailable = !onlyAvailable)}
+      class="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3
+             px-4 py-3 sm:px-3 sm:py-2 rounded-xl border transition-colors duration-150
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1
+             {onlyAvailable ? 'bg-primary-light border-primary/30' : 'bg-white border-gray-100 hover:border-gray-200'}"
+    >
+      <span class="text-sm font-medium {onlyAvailable ? 'text-primary' : 'text-gray-500'} transition-colors">
+        판매되지 않은 상품만 보기
+      </span>
+      <span class="relative flex-shrink-0 w-10 h-[22px] rounded-full transition-colors duration-200
+                   {onlyAvailable ? 'bg-primary' : 'bg-gray-200'}">
+        <span class="absolute top-[3px] left-[3px] w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200
+                     {onlyAvailable ? 'translate-x-[18px]' : 'translate-x-0'}"></span>
+      </span>
+    </button>
 
   </section>
 

@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#007AFF',
-        'primary-dark': '#0056b3',
-        'primary-light': '#E8F2FF',
+        primary: '#E87823',
+        'primary-dark': '#C4641A',
+        'primary-light': '#FEF3E9',
         ink: '#333333'
       },
       borderRadius: {
