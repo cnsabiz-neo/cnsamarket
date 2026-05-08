@@ -1,7 +1,7 @@
 <script>
   import '../app.css';
   import { page } from '$app/stores';
-  import { BarChart2, Settings, Package, PlusCircle } from 'lucide-svelte';
+  import { BarChart2, Settings, Package } from 'lucide-svelte';
 </script>
 
 <div class="min-h-screen flex flex-col bg-white">
@@ -47,17 +47,6 @@
           <span>관리</span>
         </a>
 
-        <!-- Upload CTA -->
-        <a
-          href="/upload"
-          class="ml-2 flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium border transition-colors
-                 {$page.url.pathname === '/upload'
-                   ? 'bg-primary text-white border-primary'
-                   : 'bg-white text-primary border-primary hover:bg-primary hover:text-white'}"
-        >
-          <PlusCircle size={14} />
-          <span>물품 등록</span>
-        </a>
       </nav>
     </div>
   </header>

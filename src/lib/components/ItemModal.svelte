@@ -112,6 +112,11 @@
           <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full">
             {currentItem.group_num}모둠
           </span>
+          {#if currentItem.domain}
+            <span class="bg-orange-50 text-primary text-xs font-medium px-2.5 py-1 rounded-full">
+              {currentItem.domain}영역
+            </span>
+          {/if}
           <span class="ml-auto {currentItem.is_reserved ? 'badge-reserved' : 'badge-available'} text-xs">
             {currentItem.is_reserved ? '예약완료' : '예약가능'}
           </span>

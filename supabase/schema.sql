@@ -51,7 +51,12 @@ CREATE POLICY "items_storage_public_read"
   USING (bucket_id = 'items');
 
 -- ============================================================
--- 4. Migration — run ONLY if upgrading from v1 schema
+-- 4. Migration — add domain column (run if upgrading from earlier schema)
+-- ============================================================
+-- ALTER TABLE public.items ADD COLUMN IF NOT EXISTS domain INTEGER CHECK (domain BETWEEN 1 AND 3);
+
+-- ============================================================
+-- 5. Migration — run ONLY if upgrading from v1 schema
 --    (skip if creating fresh)
 -- ============================================================
 -- ALTER TABLE public.items RENAME COLUMN status TO is_reserved;

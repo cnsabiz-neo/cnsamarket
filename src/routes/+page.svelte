@@ -10,9 +10,17 @@
   // Filters
   let selectedClass = 0;
   let selectedGroup = 0;
+  let domainFilter  = 0;   // 0=all 1=책/학습 2=의류 3=취미
   let searchQuery   = '';
   let onlyAvailable = false;
   let priceFilter   = 'all'; // 'all' | 'under5' | '5to10' | 'over10'
+
+  const DOMAINS = [
+    { key: 0, label: '전체' },
+    { key: 1, label: '1영역 · 책/학습' },
+    { key: 2, label: '2영역 · 의류/액세서리' },
+    { key: 3, label: '3영역 · 취미/굿즈' }
+  ];
 
   // Modal
   let selectedItem = null;
@@ -33,6 +41,7 @@
     if (onlyAvailable && item.is_reserved) return false;
     if (selectedClass !== 0 && item.class_num !== selectedClass) return false;
     if (selectedGroup !== 0 && item.group_num !== selectedGroup) return false;
+    if (domainFilter  !== 0 && item.domain    !== domainFilter)  return false;
     if (priceFilter === 'under5'  && item.price >= 5000) return false;
     if (priceFilter === '5to10'   && (item.price < 5000 || item.price > 10000)) return false;
     if (priceFilter === 'over10'  && item.price <= 10000) return false;
@@ -128,6 +137,19 @@
             <option value={g}>{g}모둠</option>
           {/each}
         </select>
+      </div>
+    </div>
+
+    <!-- Domain filter chips -->
+    <div>
+      <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">영역</p>
+      <div class="flex flex-wrap gap-1.5">
+        {#each DOMAINS as d}
+          <button
+            class="filter-btn {domainFilter === d.key ? 'filter-btn-active' : 'filter-btn-inactive'}"
+            on:click={() => (domainFilter = d.key)}
+          >{d.label}</button>
+        {/each}
       </div>
     </div>
 
