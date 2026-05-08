@@ -2,10 +2,13 @@ import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/supabaseAdmin.js';
 
 export async function POST({ request, locals: { safeGetSession } }) {
-  // Require Google login
+  // Require Google login with school email
   const { user } = await safeGetSession();
   if (!user) {
     return json({ error: '로그인이 필요합니다.' }, { status: 401 });
+  }
+  if (!user.email?.endsWith('@cnsa.hs.kr')) {
+    return json({ error: '충남소프트웨어고등학교 학생(@cnsa.hs.kr)만 예약할 수 있습니다.' }, { status: 403 });
   }
 
   let body;
