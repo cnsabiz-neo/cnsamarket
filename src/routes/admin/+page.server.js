@@ -1,15 +1,17 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/supabaseAdmin.js';
-import { ADMIN_PASSWORD } from '$env/static/private';
+import { ADMIN_EMAILS } from '$env/static/private';
 
-const SESSION_COOKIE = 'admin_session';
-
-function isAuthed(cookies) {
-  return cookies.get(SESSION_COOKIE) === ADMIN_PASSWORD;
+function isAdminEmail(email) {
+  if (!email) return false;
+  return ADMIN_EMAILS.split(',').map((e) => e.trim()).includes(email);
 }
 
-export async function load({ cookies }) {
-  if (!isAuthed(cookies)) {
+export async function load({ locals: { safeGetSession } }) {
+  const { user } = await safeGetSession();
+  const authed = !!user && isAdminEmail(user?.email);
+
+  if (!authed) {
     return { authed: false, items: [], stats: null };
   }
 
@@ -39,31 +41,9 @@ export async function load({ cookies }) {
 }
 
 export const actions = {
-  login: async ({ request, cookies }) => {
-    const formData = await request.formData();
-    const password = formData.get('password')?.toString() ?? '';
-
-    if (password !== ADMIN_PASSWORD) {
-      return fail(401, { loginError: '비밀번호가 올바르지 않습니다.' });
-    }
-
-    cookies.set(SESSION_COOKIE, ADMIN_PASSWORD, {
-      path: '/',
-      httpOnly: true,
-      maxAge: 60 * 60 * 8,
-      sameSite: 'strict'
-    });
-
-    throw redirect(303, '/admin');
-  },
-
-  logout: async ({ cookies }) => {
-    cookies.delete(SESSION_COOKIE, { path: '/' });
-    throw redirect(303, '/admin');
-  },
-
-  deleteItem: async ({ request, cookies }) => {
-    if (!isAuthed(cookies)) return fail(401, { error: '인증이 필요합니다.' });
+  deleteItem: async ({ request, locals: { safeGetSession } }) => {
+    const { user } = await safeGetSession();
+    if (!user || !isAdminEmail(user.email)) return fail(401, { error: '인증이 필요합니다.' });
 
     const formData = await request.formData();
     const id = formData.get('id')?.toString();
@@ -86,8 +66,9 @@ export const actions = {
     return { success: true };
   },
 
-  uploadItem: async ({ request, cookies }) => {
-    if (!isAuthed(cookies)) return fail(401, { uploadError: '인증이 필요합니다.' });
+  uploadItem: async ({ request, locals: { safeGetSession } }) => {
+    const { user } = await safeGetSession();
+    if (!user || !isAdminEmail(user.email)) return fail(401, { uploadError: '인증이 필요합니다.' });
 
     const formData = await request.formData();
     const title       = formData.get('title')?.toString().trim();
@@ -127,8 +108,9 @@ export const actions = {
     return { uploadSuccess: true };
   },
 
-  resetItem: async ({ request, cookies }) => {
-    if (!isAuthed(cookies)) return fail(401, { error: '인증이 필요합니다.' });
+  resetItem: async ({ request, locals: { safeGetSession } }) => {
+    const { user } = await safeGetSession();
+    if (!user || !isAdminEmail(user.email)) return fail(401, { error: '인증이 필요합니다.' });
 
     const formData = await request.formData();
     const id = formData.get('id')?.toString();
@@ -136,7 +118,7 @@ export const actions = {
 
     const { error } = await supabaseAdmin
       .from('items')
-      .update({ is_reserved: false, reserved_by: null })
+      .update({ is_reserved: false, reserved_by: null, user_id: null, user_email: null })
       .eq('id', id);
 
     if (error) return fail(500, { error: '초기화에 실패했습니다.' });

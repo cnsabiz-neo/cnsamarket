@@ -1,7 +1,13 @@
 import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/supabaseAdmin.js';
 
-export async function POST({ request }) {
+export async function POST({ request, locals: { safeGetSession } }) {
+  // Require Google login
+  const { user } = await safeGetSession();
+  if (!user) {
+    return json({ error: '로그인이 필요합니다.' }, { status: 401 });
+  }
+
   let body;
   try {
     body = await request.json();
@@ -23,7 +29,12 @@ export async function POST({ request }) {
   // Atomic update: only succeeds when is_reserved is currently false
   const { data, error } = await supabaseAdmin
     .from('items')
-    .update({ is_reserved: true, reserved_by: id })
+    .update({
+      is_reserved: true,
+      reserved_by: id,
+      user_id: user.id,
+      user_email: user.email
+    })
     .eq('id', itemId)
     .eq('is_reserved', false)
     .select()

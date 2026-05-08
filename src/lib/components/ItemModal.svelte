@@ -1,8 +1,17 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { X, CheckCircle, ImageOff, Loader2 } from 'lucide-svelte';
+  import { X, CheckCircle, ImageOff, Loader2, LogIn } from 'lucide-svelte';
+  import { supabase } from '$lib/supabase.js';
 
   export let item;
+  export let user = null;   // logged-in Supabase user (or null)
+
+  async function signIn() {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
+    });
+  }
 
   const dispatch = createEventDispatcher();
   const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n);
@@ -148,8 +157,24 @@
             <p class="font-bold text-emerald-700">예약이 완료되었습니다!</p>
             <p class="text-xs text-emerald-600 text-center mt-0.5">행사 당일 해당 모둠 부스를 방문해주세요.</p>
           </div>
+        {:else if !user}
+          <!-- Not logged in → prompt Google login -->
+          <div class="border border-gray-100 rounded-xl p-5 text-center space-y-3">
+            <p class="text-sm font-semibold text-ink">예약하려면 로그인이 필요합니다</p>
+            <p class="text-xs text-gray-400">Google 계정으로 로그인한 뒤 학번을 입력해 예약할 수 있습니다.</p>
+            <button on:click={signIn}
+              class="inline-flex items-center gap-2 btn-primary text-sm px-5 py-2.5">
+              <LogIn size={14} /> Google로 로그인
+            </button>
+          </div>
         {:else}
           <div class="border border-gray-100 rounded-xl p-4 space-y-3">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                {user.email?.[0]?.toUpperCase() ?? '?'}
+              </span>
+              <span class="text-xs text-gray-400 truncate">{user.email?.split('@')[0]}</span>
+            </div>
             <div>
               <label for="student-id-input" class="block text-sm font-semibold text-ink mb-1.5">
                 학번 입력 <span class="text-red-400 font-normal text-xs">(5자리 필수)</span>

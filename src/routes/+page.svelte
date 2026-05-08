@@ -6,6 +6,7 @@
   export let data;
 
   let { items, classCounts } = data;
+  $: user = data.user;  // from layout load
 
   // Filters
   let selectedClass = 0;
@@ -228,6 +229,7 @@
 {#if selectedItem}
   <ItemModal
     item={selectedItem}
+    {user}
     on:close={() => (selectedItem = null)}
     on:reserved={handleReserved}
   />
