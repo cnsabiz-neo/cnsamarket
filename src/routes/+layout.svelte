@@ -48,7 +48,7 @@
       <!-- Logo -->
       <a href="/" class="flex items-center gap-2.5 group flex-shrink-0">
         <img src="/logo.png" alt="아나바다 장터 로고" class="h-9 w-auto object-contain" />
-        <span class="font-semibold tracking-tight hidden sm:block" style="color: #00AC97;">큰사마켓</span>
+        <span class="font-extrabold tracking-tight hidden sm:block" style="color: #00AC97;">큰사마켓</span>
       </a>
 
       <!-- Nav links -->
