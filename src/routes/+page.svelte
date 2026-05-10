@@ -110,7 +110,7 @@
               bg-red-500 text-white text-sm font-medium
               px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2"
        role="alert">
-    ⚠️ @cnsa.hs.kr 학교 계정으로만 로그인할 수 있습니다.
+    ⚠️ Google 로그인에 실패했습니다. 다시 시도해주세요.
   </div>
 {/if}
 

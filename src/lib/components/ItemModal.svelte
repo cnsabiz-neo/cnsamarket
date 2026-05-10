@@ -165,7 +165,7 @@
           <!-- Not logged in → prompt Google login -->
           <div class="border border-gray-100 rounded-xl p-5 text-center space-y-3">
             <p class="text-sm font-semibold text-ink">예약하려면 로그인이 필요합니다</p>
-            <p class="text-xs text-gray-400">학교 Google 계정(<span class="font-medium">@cnsa.hs.kr</span>)으로 로그인한 뒤 학번을 입력해 예약할 수 있습니다.</p>
+            <p class="text-xs text-gray-400">Google 계정으로 로그인한 뒤 학번을 입력해 예약할 수 있습니다.</p>
             <button on:click={signIn}
               class="inline-flex items-center gap-2 btn-primary text-sm px-5 py-2.5">
               <LogIn size={14} /> Google로 로그인
