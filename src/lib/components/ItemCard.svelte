@@ -51,7 +51,7 @@
         {item.is_reserved ? '예약됨' : '가능'}
       </span>
     </div>
-    <p class="text-xs text-gray-400 mb-1">{item.class_num}반 {item.group_num}모둠</p>
+    <p class="text-xs text-gray-400 mb-1">{item.class_num}반 {item.group_num}조</p>
     {#if item.domain}
       <p class="text-[10px] text-gray-300 mb-1.5">{item.domain}영역</p>
     {/if}

@@ -180,11 +180,11 @@
         </select>
       </div>
       <div>
-        <label for="filter-group" class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">모둠</label>
+        <label for="filter-group" class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">조</label>
         <select id="filter-group" class="input-field" bind:value={selectedGroup}>
-          <option value={0}>전체 모둠</option>
+          <option value={0}>전체 조</option>
           {#each [1, 2, 3, 4, 5] as g}
-            <option value={g}>{g}모둠</option>
+            <option value={g}>{g}조</option>
           {/each}
         </select>
       </div>

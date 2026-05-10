@@ -332,12 +332,12 @@
           </div>
           <div>
             <label for="up-group" class="block text-sm font-medium text-ink mb-1.5">
-              모둠 <span class="text-red-400">*</span>
+              조 <span class="text-red-400">*</span>
             </label>
             <select id="up-group" name="group_num" class="input-field" required>
               <option value="">선택하세요</option>
               {#each [1,2,3,4,5] as g}
-                <option value={g}>{g}모둠</option>
+                <option value={g}>{g}조</option>
               {/each}
             </select>
           </div>
@@ -399,7 +399,7 @@
           <thead>
             <tr class="border-b border-gray-100 bg-gray-50/60">
               <th class="text-left px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">물품</th>
-              <th class="text-left px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider whitespace-nowrap">반/모둠</th>
+              <th class="text-left px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider whitespace-nowrap">반/조</th>
               <th class="text-left px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">영역</th>
               <th class="text-right px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">가격</th>
               <th class="text-left px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider">상태</th>
@@ -437,7 +437,7 @@
                     </div>
                   </td>
                   <td class="px-4 py-3 whitespace-nowrap text-gray-500 text-xs">
-                    {item.class_num}반 {item.group_num}모둠
+                    {item.class_num}반 {item.group_num}조
                   </td>
                   <td class="px-4 py-3">
                     {#if item.domain}

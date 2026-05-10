@@ -9,7 +9,7 @@
   let canvas;
   let chart;
 
-  const labels = classCounts.map((d) => `${d.class_num}학년`);
+  const labels = classCounts.map((d) => `${d.class_num}반`);
   const reservedData = classCounts.map((d) => d.reserved);
   const totalData = classCounts.map((d) => d.total);
 

@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 
 const SESSION_COOKIE = 'admin_session';
 
-const HEADERS = ['제목', '가격 (비즈쿨 머니)', '영역', '반', '모둠', '예약자 학번', '예약자 이메일'];
+const HEADERS = ['제목', '가격 (비즈쿨 머니)', '영역', '반', '조', '예약자 학번', '예약자 이메일'];
 const DOMAIN_LABELS = { 1: '1영역 (책·학습)', 2: '2영역 (의류·액세서리)', 3: '3영역 (취미·굿즈)' };
 
 function itemToRow(item) {
@@ -13,7 +13,7 @@ function itemToRow(item) {
     item.price ?? 0,
     item.domain ? DOMAIN_LABELS[item.domain] : '',
     `${item.class_num}반`,
-    `${item.group_num}모둠`,
+    `${item.group_num}조`,
     item.reserved_by ?? '',
     item.user_email ?? ''
   ];

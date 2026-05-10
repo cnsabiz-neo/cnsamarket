@@ -123,7 +123,7 @@
             {currentItem.class_num}반
           </span>
           <span class="bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full">
-            {currentItem.group_num}모둠
+            {currentItem.group_num}조
           </span>
           {#if currentItem.domain}
             <span class="bg-orange-50 text-primary text-xs font-medium px-2.5 py-1 rounded-full">
@@ -159,7 +159,7 @@
           <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-5 flex flex-col items-center gap-2">
             <CheckCircle size={28} class="text-emerald-500" />
             <p class="font-bold text-emerald-700">예약이 완료되었습니다!</p>
-            <p class="text-xs text-emerald-600 text-center mt-0.5">행사 당일 해당 모둠 부스를 방문해주세요.</p>
+            <p class="text-xs text-emerald-600 text-center mt-0.5">행사 당일 해당 조 부스를 방문해주세요.</p>
           </div>
         {:else if !user}
           <!-- Not logged in → prompt Google login -->
