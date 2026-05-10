@@ -1,6 +1,11 @@
-import ws from 'ws';
+import { WebSocket } from 'ws';
 import { createServerClient } from '@supabase/ssr';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+
+// Polyfill WebSocket for Node.js 20 (no native WebSocket support)
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = WebSocket;
+}
 
 export const handle = async ({ event, resolve }) => {
   event.locals.supabase = createServerClient(
@@ -14,11 +19,7 @@ export const handle = async ({ event, resolve }) => {
             event.cookies.set(name, value, { ...options, path: '/' })
           );
         }
-      },
-      global: {
-        fetch: fetch
-      },
-      realtime: { transport: ws }
+      }
     }
   );
 
