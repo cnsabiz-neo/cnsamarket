@@ -503,7 +503,7 @@
         <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
           <span>{filteredItems.length}개 항목</span>
           <span class="font-semibold text-primary">
-            합계: ₩{fmt(filteredItems.reduce((s, i) => s + (i.price ?? 0), 0))}
+            예상 수익: ₩{fmt(filteredItems.filter(i => i.is_reserved).reduce((s, i) => s + (i.price ?? 0), 0))}
           </span>
         </div>
       {/if}
