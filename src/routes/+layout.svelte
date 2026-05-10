@@ -26,7 +26,6 @@
       redirect_uri: `${window.location.origin}/auth/callback`,
       response_type: 'code',
       scope: 'openid email profile',
-      hd: 'cnsa.hs.kr',
       prompt: 'select_account'
     });
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
