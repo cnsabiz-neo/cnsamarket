@@ -106,6 +106,6 @@
 
   <!-- Footer -->
   <footer class="border-t border-gray-100 py-5 text-center text-xs text-gray-300">
-    &copy; 2026 아나바다 장터 &nbsp;|&nbsp; Developed by 20529 차유근
+    &copy; 2026 큰사마켓 &nbsp;|&nbsp; Web by 차유근 &nbsp;·&nbsp; Security by 김윤서
   </footer>
 </div>
