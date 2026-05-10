@@ -22,7 +22,10 @@
   async function signIn() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: { hd: 'cnsa.hs.kr' }
+      }
     });
   }
 

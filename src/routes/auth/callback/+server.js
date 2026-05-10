@@ -6,9 +6,16 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) throw redirect(303, next);
+    if (!error) {
+      // Verify school email domain
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email?.endsWith('@cnsa.hs.kr')) {
+        await supabase.auth.signOut();
+        throw redirect(303, '/?error=school_only');
+      }
+      throw redirect(303, next);
+    }
   }
 
-  // If something went wrong, go home
   throw redirect(303, '/');
 };

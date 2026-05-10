@@ -2,8 +2,11 @@
   import { PartyPopper, Search, ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-svelte';
   import ItemCard from '$lib/components/ItemCard.svelte';
   import ItemModal from '$lib/components/ItemModal.svelte';
+  import { page } from '$app/stores';
 
   export let data;
+
+  $: domainError = $page.url.searchParams.get('error') === 'school_only';
 
   let { items, classCounts } = data;
   $: user = data.user;  // from layout load
@@ -102,6 +105,15 @@
   <title>큰사마켓</title>
 </svelte:head>
 
+{#if domainError}
+  <div class="fixed top-20 left-1/2 -translate-x-1/2 z-50
+              bg-red-500 text-white text-sm font-medium
+              px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2"
+       role="alert">
+    ⚠️ @cnsa.hs.kr 학교 계정으로만 로그인할 수 있습니다.
+  </div>
+{/if}
+
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
   <!-- Header -->
@@ -154,8 +166,9 @@
     <!-- Class & Group dropdowns -->
     <div class="grid grid-cols-2 gap-3">
       <div>
-        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">반</label>
+        <label for="filter-class" class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">반</label>
         <select
+          id="filter-class"
           class="input-field"
           bind:value={selectedClass}
           on:change={() => (selectedGroup = 0)}
@@ -167,8 +180,8 @@
         </select>
       </div>
       <div>
-        <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">모둠</label>
-        <select class="input-field" bind:value={selectedGroup}>
+        <label for="filter-group" class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">모둠</label>
+        <select id="filter-group" class="input-field" bind:value={selectedGroup}>
           <option value={0}>전체 모둠</option>
           {#each [1, 2, 3, 4, 5] as g}
             <option value={g}>{g}모둠</option>
