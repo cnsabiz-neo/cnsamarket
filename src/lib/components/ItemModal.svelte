@@ -1,16 +1,21 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { X, CheckCircle, ImageOff, Loader2, LogIn } from 'lucide-svelte';
-  import { supabase } from '$lib/supabase.js';
+  import { PUBLIC_GOOGLE_CLIENT_ID } from '$env/static/public';
 
   export let item;
   export let user = null;   // logged-in Supabase user (or null)
 
-  async function signIn() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
+  function signIn() {
+    const params = new URLSearchParams({
+      client_id: PUBLIC_GOOGLE_CLIENT_ID,
+      redirect_uri: `${window.location.origin}/auth/callback`,
+      response_type: 'code',
+      scope: 'openid email profile',
+      hd: 'cnsa.hs.kr',
+      prompt: 'select_account'
     });
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   }
 
   const dispatch = createEventDispatcher();

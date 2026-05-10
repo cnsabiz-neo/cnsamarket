@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
   import { supabase } from '$lib/supabase.js';
+  import { PUBLIC_GOOGLE_CLIENT_ID } from '$env/static/public';
   import { BarChart2, Settings, Package, LogIn, LogOut } from 'lucide-svelte';
 
   export let data;
@@ -19,14 +20,16 @@
     return () => subscription.unsubscribe();
   });
 
-  async function signIn() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: { hd: 'cnsa.hs.kr' }
-      }
+  function signIn() {
+    const params = new URLSearchParams({
+      client_id: PUBLIC_GOOGLE_CLIENT_ID,
+      redirect_uri: `${window.location.origin}/auth/callback`,
+      response_type: 'code',
+      scope: 'openid email profile',
+      hd: 'cnsa.hs.kr',
+      prompt: 'select_account'
     });
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   }
 
   async function signOut() {
