@@ -7,9 +7,7 @@ export async function POST({ request, locals: { safeGetSession } }) {
   if (!user) {
     return json({ error: '로그인이 필요합니다.' }, { status: 401 });
   }
-  if (!user.email?.endsWith('@cnsa.hs.kr')) {
-    return json({ error: '충남소프트웨어고등학교 학생(@cnsa.hs.kr)만 예약할 수 있습니다.' }, { status: 403 });
-  }
+
 
   let body;
   try {

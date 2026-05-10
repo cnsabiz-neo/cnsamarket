@@ -33,12 +33,5 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
   if (error) throw redirect(303, '/');
 
-  // Verify school email domain
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.email?.endsWith('@cnsa.hs.kr')) {
-    await supabase.auth.signOut();
-    throw redirect(303, '/?error=school_only');
-  }
-
   throw redirect(303, next);
 };

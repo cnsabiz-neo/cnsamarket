@@ -171,19 +171,6 @@
               <LogIn size={14} /> Google로 로그인
             </button>
           </div>
-        {:else if !user.email?.endsWith('@cnsa.hs.kr')}
-          <!-- Wrong email domain -->
-          <div class="border border-red-100 bg-red-50 rounded-xl p-5 text-center space-y-2">
-            <p class="text-sm font-semibold text-red-600">학교 계정이 아닙니다</p>
-            <p class="text-xs text-red-400">
-              예약은 <span class="font-medium">@cnsa.hs.kr</span> 계정만 가능합니다.<br />
-              현재 로그인: {user.email}
-            </p>
-            <button on:click={signIn}
-              class="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline mt-1">
-              <LogIn size={13} /> 학교 계정으로 다시 로그인
-            </button>
-          </div>
         {:else}
           <div class="border border-gray-100 rounded-xl p-4 space-y-3">
             <div class="flex items-center gap-1.5 mb-1">
