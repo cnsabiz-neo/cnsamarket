@@ -53,6 +53,8 @@
   $: priceNum   = parseInt(priceValue.replace(/\D/g, '') || '0');
   $: priceError = priceValue && (priceNum < 1000 || priceNum > 20000)
     ? '1,000 ~ 20,000 비즈쿨 머니 사이여야 합니다.'
+    : priceValue && priceNum % 1000 !== 0
+    ? '1,000 단위로만 입력 가능합니다. (예: 3000, 5000)'
     : '';
 
   function handlePriceInput(e) {

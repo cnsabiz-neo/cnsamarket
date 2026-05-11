@@ -108,6 +108,8 @@ export const actions = {
       return fail(400, { uploadError: '영역을 선택해주세요.' });
     if (isNaN(priceRaw) || priceRaw < 1000 || priceRaw > 20000)
       return fail(400, { uploadError: '가격은 1,000 ~ 20,000 비즈쿨 머니 사이여야 합니다.' });
+    if (priceRaw % 1000 !== 0)
+      return fail(400, { uploadError: '가격은 1,000 단위로만 입력 가능합니다.' });
 
     const { error: insertError } = await supabaseAdmin.from('items').insert({
       title, description,
