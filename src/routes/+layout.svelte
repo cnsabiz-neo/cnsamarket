@@ -47,11 +47,11 @@
 <div class="min-h-screen flex flex-col bg-white">
   <!-- Nav -->
   <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
       <!-- Logo -->
-      <a href="/" class="flex items-center gap-2.5 group flex-shrink-0">
-        <img src="/logo.png" alt="큰사마켓 로고" class="h-9 w-auto object-contain" />
-        <span class="font-extrabold tracking-tight hidden sm:block" style="color: #00AC97;">큰사마켓</span>
+      <a href="/" class="flex items-center gap-3 group flex-shrink-0">
+        <img src="/logo.png" alt="큰사마켓 로고" class="h-11 w-auto object-contain" />
+        <span class="text-xl font-extrabold tracking-tight hidden sm:block" style="color: #00AC97;">큰사마켓</span>
       </a>
 
       <!-- Desktop nav links -->
