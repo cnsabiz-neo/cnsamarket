@@ -92,7 +92,7 @@
             </button>
           </div>
         {:else}
-          <div class="flex flex-col items-end gap-1">
+          <div class="relative">
             <button on:click={signIn}
               class="flex items-center gap-1.5 btn-primary text-xs px-3.5 py-2">
               <span class="flex items-center justify-center w-5 h-5 bg-white rounded-full flex-shrink-0">
@@ -106,7 +106,9 @@
               </span>
               <span>Google 로그인</span>
             </button>
-            <span class="text-[10px] text-gray-400 hidden sm:block">@cnsa.hs.kr 계정만 가능</span>
+            <span class="absolute top-full right-0 mt-0.5 text-[10px] text-gray-400 whitespace-nowrap hidden sm:block">
+              @cnsa.hs.kr 계정만 가능
+            </span>
           </div>
         {/if}
 
