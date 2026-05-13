@@ -106,9 +106,6 @@
               </span>
               <span>Google 로그인</span>
             </button>
-            <span class="absolute top-full right-0 mt-0.5 text-[10px] text-gray-400 whitespace-nowrap hidden sm:block">
-              @cnsa.hs.kr 계정만 가능
-            </span>
           </div>
         {/if}
 
