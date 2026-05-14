@@ -42,7 +42,6 @@
   async function signIn() {
     const verifier = generateCodeVerifier();
     const challenge = await generateCodeChallenge(verifier);
-    document.cookie = `pkce_verifier=${verifier}; path=/; max-age=300; SameSite=Lax; Secure`;
 
     const params = new URLSearchParams({
       client_id: PUBLIC_GOOGLE_CLIENT_ID,
@@ -51,7 +50,8 @@
       scope: 'openid email profile',
       prompt: 'select_account',
       code_challenge: challenge,
-      code_challenge_method: 'S256'
+      code_challenge_method: 'S256',
+      state: verifier
     });
     window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   }

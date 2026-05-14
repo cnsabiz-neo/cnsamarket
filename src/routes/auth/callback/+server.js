@@ -19,7 +19,7 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
       client_secret: GOOGLE_CLIENT_SECRET,
       redirect_uri: `${PUBLIC_SITE_URL}/auth/callback`,
       grant_type: 'authorization_code',
-      code_verifier: cookies.get('pkce_verifier') ?? ''
+      code_verifier: url.searchParams.get('state') ?? ''
     })
   });
 
