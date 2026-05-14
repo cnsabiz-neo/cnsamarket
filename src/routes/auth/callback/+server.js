@@ -24,7 +24,10 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
 
   const tokens = await tokenRes.json();
 
-  if (!tokens.id_token) throw redirect(303, '/?error=login_failed');
+  if (!tokens.id_token) {
+    const msg = encodeURIComponent(tokens.error_description ?? tokens.error ?? 'no_id_token');
+    throw redirect(303, `/?error=token_failed&msg=${msg}`);
+  }
 
   // JWT payload에서 이메일 추출 (검증 전 확인용)
   const payload = JSON.parse(atob(tokens.id_token.split('.')[1]));
@@ -41,7 +44,10 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
     token: tokens.id_token
   });
 
-  if (error) throw redirect(303, '/?error=login_failed');
+  if (error) {
+    const msg = encodeURIComponent(error.message ?? 'supabase_error');
+    throw redirect(303, `/?error=supabase_failed&msg=${msg}`);
+  }
 
   throw redirect(303, next);
 };
