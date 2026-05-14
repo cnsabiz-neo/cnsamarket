@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import { GOOGLE_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_SITE_URL } from '$env/static/public';
 
-export const GET = async ({ url, locals: { supabase } }) => {
+export const GET = async ({ url, cookies, locals: { supabase } }) => {
   const code = url.searchParams.get('code');
   const next = url.searchParams.get('next') ?? '/';
 
@@ -17,7 +17,8 @@ export const GET = async ({ url, locals: { supabase } }) => {
       client_id: PUBLIC_GOOGLE_CLIENT_ID,
       client_secret: GOOGLE_CLIENT_SECRET,
       redirect_uri: `${PUBLIC_SITE_URL}/auth/callback`,
-      grant_type: 'authorization_code'
+      grant_type: 'authorization_code',
+      code_verifier: cookies.get('pkce_verifier') ?? ''
     })
   });
 
