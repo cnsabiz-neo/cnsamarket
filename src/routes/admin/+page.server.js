@@ -75,8 +75,19 @@ export const actions = {
       if (path) await supabaseAdmin.storage.from('items').remove([path]);
     }
 
-    const { error } = await supabaseAdmin.from('items').delete().eq('id', id);
-    if (error) return fail(500, { error: '삭제에 실패했습니다.' });
+    const { data: deleted, error } = await supabaseAdmin
+      .from('items')
+      .delete()
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('Delete error:', error);
+      return fail(500, { error: `삭제 실패: ${error.message}` });
+    }
+    if (!deleted || deleted.length === 0) {
+      return fail(500, { error: '삭제된 항목이 없습니다. Supabase 권한(RLS) 설정을 확인하세요.' });
+    }
 
     return { success: true };
   },
@@ -131,12 +142,19 @@ export const actions = {
     const id = formData.get('id')?.toString();
     if (!id) return fail(400, { error: '물품 ID가 없습니다.' });
 
-    const { error } = await supabaseAdmin
+    const { data: updated, error } = await supabaseAdmin
       .from('items')
       .update({ is_reserved: false, reserved_by: null, user_id: null, user_email: null })
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
-    if (error) return fail(500, { error: '초기화에 실패했습니다.' });
+    if (error) {
+      console.error('Reset error:', error);
+      return fail(500, { error: `초기화 실패: ${error.message}` });
+    }
+    if (!updated || updated.length === 0) {
+      return fail(500, { error: '초기화된 항목이 없습니다. Supabase 권한(RLS) 설정을 확인하세요.' });
+    }
 
     return { success: true };
   }

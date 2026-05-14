@@ -147,6 +147,12 @@
       </form>
     </div>
 
+    {#if form?.error}
+      <div class="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-6">
+        {form.error}
+      </div>
+    {/if}
+
     <!-- ── Stats ─────────────────────────────────────────────── -->
     {#if stats}
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
