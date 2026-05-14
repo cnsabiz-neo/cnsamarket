@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { GOOGLE_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_SITE_URL } from '$env/static/public';
+import { supabaseAdmin } from '$lib/supabaseAdmin.js';
 
 export const GET = async ({ url, cookies, locals: { supabase } }) => {
   const code = url.searchParams.get('code');
@@ -8,7 +9,7 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
 
   if (!code) throw redirect(303, '/');
 
-  // Exchange authorization code for tokens directly with Google
+  // Google 토큰 교환
   const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -29,7 +30,7 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
     throw redirect(303, `/?error=token_failed&msg=${msg}`);
   }
 
-  // JWT payload에서 이메일 추출 (검증 전 확인용)
+  // JWT에서 이메일 추출
   const payload = JSON.parse(atob(tokens.id_token.split('.')[1]));
   const email = payload.email ?? '';
 
@@ -38,14 +39,36 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
     throw redirect(303, '/?error=unauthorized_domain');
   }
 
-  // Sign in to Supabase using the Google ID token
-  const { error } = await supabase.auth.signInWithIdToken({
-    provider: 'google',
-    token: tokens.id_token
+  // Supabase에 유저 생성 (이미 있으면 무시)
+  await supabaseAdmin.auth.admin.createUser({
+    email,
+    email_confirm: true,
+    user_metadata: {
+      full_name: payload.name ?? '',
+      avatar_url: payload.picture ?? '',
+      provider: 'google'
+    }
   });
 
-  if (error) {
-    const msg = encodeURIComponent(error.message ?? 'supabase_error');
+  // 매직링크 토큰 생성 (이메일 발송 없이 토큰만 반환)
+  const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+    type: 'magiclink',
+    email
+  });
+
+  if (linkError || !linkData?.properties?.hashed_token) {
+    const msg = encodeURIComponent(linkError?.message ?? 'link_gen_failed');
+    throw redirect(303, `/?error=supabase_failed&msg=${msg}`);
+  }
+
+  // 토큰으로 세션 생성 (SSR 클라이언트가 쿠키 자동 설정)
+  const { error: verifyError } = await supabase.auth.verifyOtp({
+    token_hash: linkData.properties.hashed_token,
+    type: 'email'
+  });
+
+  if (verifyError) {
+    const msg = encodeURIComponent(verifyError.message ?? 'verify_failed');
     throw redirect(303, `/?error=supabase_failed&msg=${msg}`);
   }
 
