@@ -79,14 +79,16 @@
   }
 
   // ── Enhance helpers ─────────────────────────────────────────
+  // 제출 핸들러는 인자로 submit 이벤트를 받고, update는 "응답 후 콜백"에서만 사용 가능
   function makeEnhance(afterSuccess) {
-    return ({ update }) => {
+    return () => {
       submitting = true;
-      return update({ reset: false }).then(() => {
+      return async ({ update }) => {
+        await update({ reset: false });
         submitting = false;
         invalidateAll();
         afterSuccess?.();
-      });
+      };
     };
   }
 
@@ -231,7 +233,8 @@
         <form
           method="POST"
           action="?/uploadItem"
-          use:enhance={async ({ formData, cancel }) => {
+          enctype="multipart/form-data"
+          use:enhance={({ cancel }) => {
             uploading = true; clientError = '';
             if (imageFile) {
               const ext = imageFile.name.split('.').pop()?.toLowerCase();
@@ -243,8 +246,6 @@
                 clientError = '이미지 크기는 10MB 이하여야 합니다.';
                 uploading = false; cancel(); return;
               }
-              // 파일을 서버로 전송 → 서버가 service_role 키로 Storage 업로드
-              formData.set('image', imageFile);
             }
             return async ({ update }) => {
               uploading = false;
@@ -274,7 +275,7 @@
                 <span class="text-sm text-gray-400">클릭하여 사진 선택 (JPG, PNG, WebP)</span>
               </label>
             {/if}
-            <input id="upload-image-input" type="file" accept="image/*" class="hidden" on:change={handleImageChange} />
+            <input id="upload-image-input" name="image" type="file" accept="image/*" class="hidden" on:change={handleImageChange} />
             <div class="flex items-center gap-1.5 mt-2">
               <Info size={12} class="text-primary flex-shrink-0" />
               <p class="text-xs text-gray-400">되도록 <span class="font-medium text-ink">1:1 비율(정사각형)</span> 사진을 올려주세요!</p>
