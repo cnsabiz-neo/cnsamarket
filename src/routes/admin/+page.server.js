@@ -102,7 +102,7 @@ export const actions = {
     const groupNum    = parseInt(formData.get('group_num') ?? '0');
     const domain      = parseInt(formData.get('domain')    ?? '0');
     const priceRaw    = parseInt(formData.get('price')     ?? '0');
-    const imageUrl    = formData.get('image_url')?.toString() || null;
+    const imageFile   = formData.get('image');
 
     if (!title)
       return fail(400, { uploadError: '물품 이름을 입력해주세요.' });
@@ -116,6 +116,22 @@ export const actions = {
       return fail(400, { uploadError: '가격은 1,000 ~ 20,000 비즈쿨 머니 사이여야 합니다.' });
     if (priceRaw % 1000 !== 0)
       return fail(400, { uploadError: '가격은 1,000 단위로만 입력 가능합니다.' });
+
+    // 이미지가 있으면 service_role 키로 Storage에 업로드 (RLS 우회)
+    let imageUrl = null;
+    if (imageFile && typeof imageFile !== 'string' && imageFile.size > 0) {
+      const ext = imageFile.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadError } = await supabaseAdmin.storage
+        .from('items')
+        .upload(fileName, imageFile, { contentType: imageFile.type });
+      if (uploadError) {
+        console.error('Image upload error:', uploadError);
+        return fail(500, { uploadError: `이미지 업로드 실패: ${uploadError.message}` });
+      }
+      const { data } = supabaseAdmin.storage.from('items').getPublicUrl(fileName);
+      imageUrl = data.publicUrl;
+    }
 
     const { error: insertError } = await supabaseAdmin.from('items').insert({
       title, description,

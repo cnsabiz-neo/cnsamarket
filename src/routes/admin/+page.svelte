@@ -6,7 +6,6 @@
     ShieldCheck, Wallet, Plus, ChevronUp,
     Download, Loader2, Info, X
   } from 'lucide-svelte';
-  import { supabase } from '$lib/supabase.js';
   import { formatNumber as fmt } from '$lib/utils.js';
   import { CLASS_NUMBERS, GROUP_NUMBERS, DOMAIN_SHORT } from '$lib/constants.js';
 
@@ -240,15 +239,12 @@
                 clientError = '지원하지 않는 이미지 형식입니다.';
                 uploading = false; cancel(); return;
               }
-              const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-              const { error: upErr } = await supabase.storage
-                .from('items').upload(fileName, imageFile, { contentType: imageFile.type });
-              if (upErr) {
-                clientError = `이미지 업로드 실패: ${upErr.message}`;
+              if (imageFile.size > 10 * 1024 * 1024) {
+                clientError = '이미지 크기는 10MB 이하여야 합니다.';
                 uploading = false; cancel(); return;
               }
-              const { data } = supabase.storage.from('items').getPublicUrl(fileName);
-              formData.set('image_url', data.publicUrl);
+              // 파일을 서버로 전송 → 서버가 service_role 키로 Storage 업로드
+              formData.set('image', imageFile);
             }
             return async ({ update }) => {
               uploading = false;
