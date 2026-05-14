@@ -23,7 +23,16 @@ export const GET = async ({ url, locals: { supabase } }) => {
 
   const tokens = await tokenRes.json();
 
-  if (!tokens.id_token) throw redirect(303, '/');
+  if (!tokens.id_token) throw redirect(303, '/?error=login_failed');
+
+  // JWT payload에서 이메일 추출 (검증 전 확인용)
+  const payload = JSON.parse(atob(tokens.id_token.split('.')[1]));
+  const email = payload.email ?? '';
+
+  // @cnsa.hs.kr 계정만 허용
+  if (!email.endsWith('@cnsa.hs.kr')) {
+    throw redirect(303, '/?error=unauthorized_domain');
+  }
 
   // Sign in to Supabase using the Google ID token
   const { error } = await supabase.auth.signInWithIdToken({
@@ -31,7 +40,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
     token: tokens.id_token
   });
 
-  if (error) throw redirect(303, '/');
+  if (error) throw redirect(303, '/?error=login_failed');
 
   throw redirect(303, next);
 };

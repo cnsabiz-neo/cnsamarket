@@ -9,6 +9,7 @@
 
   export let data;
   $: user = data.user;
+  $: errorParam = $page.url.searchParams.get('error');
 
   let menuOpen = false;
 
@@ -145,6 +146,13 @@
       </nav>
     {/if}
   </header>
+
+  <!-- 로그인 에러 메시지 -->
+  {#if errorParam === 'unauthorized_domain'}
+    <div class="bg-red-50 border-b border-red-100 px-4 py-2.5 text-center text-sm text-red-600">
+      @cnsa.hs.kr 학교 계정으로만 로그인할 수 있습니다.
+    </div>
+  {/if}
 
   <!-- Page content -->
   <main class="flex-1">
