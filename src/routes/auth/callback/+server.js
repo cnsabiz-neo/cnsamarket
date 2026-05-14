@@ -25,10 +25,7 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
 
   const tokens = await tokenRes.json();
 
-  if (!tokens.id_token) {
-    const msg = encodeURIComponent(tokens.error_description ?? tokens.error ?? 'no_id_token');
-    throw redirect(303, `/?error=token_failed&msg=${msg}`);
-  }
+  if (!tokens.id_token) throw redirect(303, '/?error=login_failed');
 
   // JWT에서 이메일 추출
   const payload = JSON.parse(atob(tokens.id_token.split('.')[1]));
@@ -57,8 +54,7 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
   });
 
   if (linkError || !linkData?.properties?.hashed_token) {
-    const msg = encodeURIComponent(linkError?.message ?? 'link_gen_failed');
-    throw redirect(303, `/?error=supabase_failed&msg=${msg}`);
+    throw redirect(303, '/?error=login_failed');
   }
 
   // 토큰으로 세션 생성 (SSR 클라이언트가 쿠키 자동 설정)
@@ -67,10 +63,7 @@ export const GET = async ({ url, cookies, locals: { supabase } }) => {
     type: 'email'
   });
 
-  if (verifyError) {
-    const msg = encodeURIComponent(verifyError.message ?? 'verify_failed');
-    throw redirect(303, `/?error=supabase_failed&msg=${msg}`);
-  }
+  if (verifyError) throw redirect(303, '/?error=login_failed');
 
   throw redirect(303, next);
 };
