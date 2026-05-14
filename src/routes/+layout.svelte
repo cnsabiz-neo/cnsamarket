@@ -5,6 +5,7 @@
   import { invalidateAll } from '$app/navigation';
   import { supabase } from '$lib/supabase.js';
   import { BarChart2, Settings, Package, LogOut, Menu, X } from 'lucide-svelte';
+  import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_SITE_URL } from '$env/static/public';
 
   export let data;
   $: user = data.user;
@@ -24,8 +25,35 @@
     return () => subscription.unsubscribe();
   });
 
-  function signIn() {
-    window.location.href = '/auth/login';
+  function generateCodeVerifier() {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode(...array))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+
+  async function generateCodeChallenge(verifier) {
+    const data = new TextEncoder().encode(verifier);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  }
+
+  async function signIn() {
+    const verifier = generateCodeVerifier();
+    const challenge = await generateCodeChallenge(verifier);
+    document.cookie = `pkce_verifier=${verifier}; path=/; max-age=300; SameSite=Lax; Secure`;
+
+    const params = new URLSearchParams({
+      client_id: PUBLIC_GOOGLE_CLIENT_ID,
+      redirect_uri: `${PUBLIC_SITE_URL}/auth/callback`,
+      response_type: 'code',
+      scope: 'openid email profile',
+      prompt: 'select_account',
+      code_challenge: challenge,
+      code_challenge_method: 'S256'
+    });
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   }
 
   async function signOut() {
