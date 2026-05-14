@@ -1,8 +1,6 @@
 import { supabaseAdmin } from '$lib/supabaseAdmin.js';
-import { ADMIN_PASSWORD } from '$env/static/private';
+import { isAdmin } from '$lib/server/adminAuth.js';
 import * as XLSX from 'xlsx';
-
-const SESSION_COOKIE = 'admin_session';
 
 const HEADERS = ['제목', '가격 (비즈쿨 머니)', '영역', '반', '조', '예약자 학번', '예약자 이메일'];
 const DOMAIN_LABELS = { 1: '1영역 (책·학습)', 2: '2영역 (의류·액세서리)', 3: '3영역 (취미·굿즈)' };
@@ -29,7 +27,7 @@ function buildSheet(items) {
 }
 
 export async function GET({ url, cookies }) {
-  if (cookies.get(SESSION_COOKIE) !== ADMIN_PASSWORD) {
+  if (!isAdmin(cookies)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -74,7 +72,7 @@ export async function GET({ url, cookies }) {
   const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
   const label = type === 'class' ? '반별' : type === 'domain' ? '영역별' : '전체';
   const date  = new Date().toISOString().slice(0, 10);
-  const filename = encodeURIComponent(`아나바다_${label}_${date}.xlsx`);
+  const filename = encodeURIComponent(`큰사마켓_${label}_${date}.xlsx`);
 
   return new Response(buf, {
     headers: {

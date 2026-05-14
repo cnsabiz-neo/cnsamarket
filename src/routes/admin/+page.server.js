@@ -1,15 +1,10 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/supabaseAdmin.js';
 import { ADMIN_PASSWORD } from '$env/static/private';
-
-const SESSION_COOKIE = 'admin_session';
-
-function isAuthed(cookies) {
-  return cookies.get(SESSION_COOKIE) === ADMIN_PASSWORD;
-}
+import { ADMIN_SESSION_COOKIE, isAdmin } from '$lib/server/adminAuth.js';
 
 export async function load({ cookies }) {
-  if (!isAuthed(cookies)) {
+  if (!isAdmin(cookies)) {
     return { authed: false, items: [], stats: null };
   }
 
@@ -47,7 +42,7 @@ export const actions = {
       return fail(401, { loginError: '비밀번호가 올바르지 않습니다.' });
     }
 
-    cookies.set(SESSION_COOKIE, ADMIN_PASSWORD, {
+    cookies.set(ADMIN_SESSION_COOKIE, ADMIN_PASSWORD, {
       path: '/',
       httpOnly: true,
       maxAge: 60 * 60 * 8,
@@ -58,12 +53,12 @@ export const actions = {
   },
 
   logout: async ({ cookies }) => {
-    cookies.delete(SESSION_COOKIE, { path: '/' });
+    cookies.delete(ADMIN_SESSION_COOKIE, { path: '/' });
     throw redirect(303, '/admin');
   },
 
   deleteItem: async ({ request, cookies }) => {
-    if (!isAuthed(cookies)) return fail(401, { error: '인증이 필요합니다.' });
+    if (!isAdmin(cookies)) return fail(401, { error: '인증이 필요합니다.' });
 
     const formData = await request.formData();
     const id = formData.get('id')?.toString();
@@ -87,7 +82,7 @@ export const actions = {
   },
 
   uploadItem: async ({ request, cookies }) => {
-    if (!isAuthed(cookies)) return fail(401, { uploadError: '인증이 필요합니다.' });
+    if (!isAdmin(cookies)) return fail(401, { uploadError: '인증이 필요합니다.' });
 
     const formData = await request.formData();
     const title       = formData.get('title')?.toString().trim();
@@ -103,7 +98,7 @@ export const actions = {
     if (!classNum || classNum < 1 || classNum > 12)
       return fail(400, { uploadError: '올바른 반을 선택해주세요.' });
     if (!groupNum || groupNum < 1 || groupNum > 5)
-      return fail(400, { uploadError: '올바른 모둠을 선택해주세요.' });
+      return fail(400, { uploadError: '올바른 조를 선택해주세요.' });
     if (!domain || domain < 1 || domain > 3)
       return fail(400, { uploadError: '영역을 선택해주세요.' });
     if (isNaN(priceRaw) || priceRaw < 1000 || priceRaw > 20000)
@@ -130,7 +125,7 @@ export const actions = {
   },
 
   resetItem: async ({ request, cookies }) => {
-    if (!isAuthed(cookies)) return fail(401, { error: '인증이 필요합니다.' });
+    if (!isAdmin(cookies)) return fail(401, { error: '인증이 필요합니다.' });
 
     const formData = await request.formData();
     const id = formData.get('id')?.toString();

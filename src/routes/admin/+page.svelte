@@ -7,16 +7,15 @@
     Download, Loader2, Info, X
   } from 'lucide-svelte';
   import { supabase } from '$lib/supabase.js';
+  import { formatNumber as fmt } from '$lib/utils.js';
+  import { CLASS_NUMBERS, GROUP_NUMBERS, DOMAIN_SHORT } from '$lib/constants.js';
 
   export let data;
   export let form;
 
   $: ({ authed, items, stats } = data);
 
-  const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n);
-
-  const DOMAIN_LABELS = { 1: '1영역', 2: '2영역', 3: '3영역' };
-  const DOMAIN_FULL   = {
+  const DOMAIN_FULL = {
     1: '1영역 · 책/학습/문구',
     2: '2영역 · 의류/액세서리',
     3: '3영역 · 취미/굿즈'
@@ -99,7 +98,7 @@
 </script>
 
 <svelte:head>
-  <title>관리자 — 아나바다 장터</title>
+  <title>관리자 — 큰사마켓</title>
 </svelte:head>
 
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
@@ -327,7 +326,7 @@
             </label>
             <select id="up-class" name="class_num" class="input-field" required>
               <option value="">선택하세요</option>
-              {#each Array.from({ length: 12 }, (_, i) => i + 1) as c}
+              {#each CLASS_NUMBERS as c}
                 <option value={c}>{c}반</option>
               {/each}
             </select>
@@ -338,7 +337,7 @@
             </label>
             <select id="up-group" name="group_num" class="input-field" required>
               <option value="">선택하세요</option>
-              {#each [1,2,3,4,5] as g}
+              {#each GROUP_NUMBERS as g}
                 <option value={g}>{g}조</option>
               {/each}
             </select>
@@ -377,13 +376,13 @@
       </div>
       <select class="input-field w-auto text-sm" bind:value={filterClass}>
         <option value={0}>전체 반</option>
-        {#each Array.from({ length: 12 }, (_, i) => i + 1) as c}
+        {#each CLASS_NUMBERS as c}
           <option value={c}>{c}반</option>
         {/each}
       </select>
       <select class="input-field w-auto text-sm" bind:value={filterDomain}>
         <option value={0}>전체 영역</option>
-        {#each Object.entries(DOMAIN_LABELS) as [k, v]}
+        {#each Object.entries(DOMAIN_SHORT) as [k, v]}
           <option value={parseInt(k)}>{v}</option>
         {/each}
       </select>
@@ -444,7 +443,7 @@
                   <td class="px-4 py-3">
                     {#if item.domain}
                       <span class="inline-block bg-orange-50 text-primary text-xs font-medium px-2 py-0.5 rounded-full">
-                        {DOMAIN_LABELS[item.domain] ?? item.domain}
+                        {DOMAIN_SHORT[item.domain] ?? item.domain}
                       </span>
                     {:else}
                       <span class="text-gray-300 text-xs">—</span>

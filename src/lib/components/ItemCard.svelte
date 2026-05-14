@@ -1,10 +1,9 @@
 <script>
   import { ImageOff } from 'lucide-svelte';
+  import { formatNumber } from '$lib/utils.js';
 
   export let item;
   export let onSelect;
-
-  const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n);
 </script>
 
 <button
@@ -57,7 +56,7 @@
     {/if}
     <!-- Price -->
     <p class="text-sm font-bold {item.is_reserved ? 'text-gray-300' : 'text-primary'}">
-      ₩{fmt(item.price)}
+      ₩{formatNumber(item.price)}
     </p>
   </div>
 </button>

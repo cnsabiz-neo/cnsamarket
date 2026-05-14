@@ -3,7 +3,7 @@ import { GOOGLE_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GOOGLE_CLIENT_ID, PUBLIC_SITE_URL } from '$env/static/public';
 import { supabaseAdmin } from '$lib/supabaseAdmin.js';
 
-export const GET = async ({ url, cookies, locals: { supabase } }) => {
+export const GET = async ({ url, locals: { supabase } }) => {
   const code = url.searchParams.get('code');
   const next = url.searchParams.get('next') ?? '/';
 

@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-  <title>판매 현황 — 아나바다 장터</title>
+  <title>판매 현황 — 큰사마켓</title>
 </svelte:head>
 
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-10">

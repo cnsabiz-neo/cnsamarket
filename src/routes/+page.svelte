@@ -2,11 +2,9 @@
   import { PartyPopper, Search, ArrowUp, ArrowDown, ChevronsUpDown } from 'lucide-svelte';
   import ItemCard from '$lib/components/ItemCard.svelte';
   import ItemModal from '$lib/components/ItemModal.svelte';
-  import { page } from '$app/stores';
+  import { CLASS_NUMBERS, GROUP_NUMBERS } from '$lib/constants.js';
 
   export let data;
-
-  $: domainError = $page.url.searchParams.get('error') === 'school_only';
 
   let { items, classCounts } = data;
   $: user = data.user;  // from layout load
@@ -105,15 +103,6 @@
   <title>큰사마켓</title>
 </svelte:head>
 
-{#if domainError}
-  <div class="fixed top-20 left-1/2 -translate-x-1/2 z-50
-              bg-red-500 text-white text-sm font-medium
-              px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2"
-       role="alert">
-    ⚠️ Google 로그인에 실패했습니다. 다시 시도해주세요.
-  </div>
-{/if}
-
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
   <!-- Header -->
@@ -174,7 +163,7 @@
           on:change={() => (selectedGroup = 0)}
         >
           <option value={0}>전체 반</option>
-          {#each Array.from({ length: 12 }, (_, i) => i + 1) as c}
+          {#each CLASS_NUMBERS as c}
             <option value={c}>{c}반</option>
           {/each}
         </select>
@@ -183,7 +172,7 @@
         <label for="filter-group" class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">조</label>
         <select id="filter-group" class="input-field" bind:value={selectedGroup}>
           <option value={0}>전체 조</option>
-          {#each [1, 2, 3, 4, 5] as g}
+          {#each GROUP_NUMBERS as g}
             <option value={g}>{g}조</option>
           {/each}
         </select>
