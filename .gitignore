@@ -9,6 +9,9 @@ dist/
 # Vercel build output
 .vercel/
 
+# Cloudflare / Wrangler local state
+.wrangler/
+
 # Environment variables — NEVER commit secrets
 .env
 .env.local
